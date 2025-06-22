@@ -1,8 +1,9 @@
 package main.java.ORM;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import main.java.CoreEntities.Book;
+
+import java.sql.*;
+import java.util.ArrayList;
 
 public class BookDAO {
 
@@ -12,79 +13,47 @@ public class BookDAO {
         try {
             this.connection = ConnectionManager.getInstance().getConnection();
         } catch (SQLException | ClassNotFoundException e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("Error initializing BookDAO: " + e.getMessage());
         }
     }
 
     public void addBook(String title, String author, String isbn) throws SQLException {
-        String sql = String.format(
-                "INSERT INTO \"Book\" (title, author, isbn) VALUES ('%s', '%s', '%s')",
-                title, author, isbn
-        );
-
-        PreparedStatement preparedStatement = null;
-
-        try {
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.executeUpdate();
+        String sql = "INSERT INTO \"Book\" (title, author, isbn) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, title);
+            ps.setString(2, author);
+            ps.setString(3, isbn);
+            ps.executeUpdate();
             System.out.println("Book added successfully.");
-        } catch (SQLException e) {
-            System.err.println("Error: " + e.getMessage());
-        } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
         }
     }
 
     public void removeBook(String isbn) throws SQLException {
-        String sql = String.format("DELETE FROM \"Book\" WHERE isbn = '%s'", isbn);
-
-        PreparedStatement preparedStatement = null;
-
-        try {
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.executeUpdate();
+        String sql = "DELETE FROM \"Book\" WHERE isbn = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, isbn);
+            ps.executeUpdate();
             System.out.println("Book removed successfully.");
-        } catch (SQLException e) {
-            System.err.println("Error: " + e.getMessage());
-        } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
         }
     }
 
     public void updateBookTitle(String isbn, String newTitle) throws SQLException {
-        String sql = String.format(
-                "UPDATE \"Book\" SET title = '%s' WHERE isbn = '%s'",
-                newTitle, isbn
-        );
-
-        PreparedStatement preparedStatement = null;
-
-        try {
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.executeUpdate();
+        String sql = "UPDATE \"Book\" SET title = ? WHERE isbn = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newTitle);
+            ps.setString(2, isbn);
+            ps.executeUpdate();
             System.out.println("Book title updated successfully.");
-        } catch (SQLException e) {
-            System.err.println("Error: " + e.getMessage());
-        } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
         }
     }
-}
 
     public Book getBook(int id) throws SQLException {
-        Book book = null;
         String sql = "SELECT * FROM \"Book\" WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    book = new Book(
+                    return new Book(
                             rs.getInt("id"),
                             rs.getString("title"),
                             rs.getString("author"),
@@ -96,7 +65,7 @@ public class BookDAO {
                 }
             }
         }
-        return book;
+        return null;
     }
 
     public ArrayList<Book> getBooksByTitle(String title) throws SQLException {
@@ -106,15 +75,7 @@ public class BookDAO {
             ps.setString(1, "%" + title + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    books.add(new Book(
-                            rs.getInt("id"),
-                            rs.getString("title"),
-                            rs.getString("author"),
-                            rs.getString("publisher"),
-                            rs.getInt("publicationYear"),
-                            rs.getString("isbn"),
-                            rs.getInt("quantityAvailable")
-                    ));
+                    books.add(mapResultSetToBook(rs));
                 }
             }
         }
@@ -128,15 +89,7 @@ public class BookDAO {
             ps.setString(1, "%" + author + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    books.add(new Book(
-                            rs.getInt("id"),
-                            rs.getString("title"),
-                            rs.getString("author"),
-                            rs.getString("publisher"),
-                            rs.getInt("publicationYear"),
-                            rs.getString("isbn"),
-                            rs.getInt("quantityAvailable")
-                    ));
+                    books.add(mapResultSetToBook(rs));
                 }
             }
         }
@@ -149,77 +102,65 @@ public class BookDAO {
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                books.add(new Book(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("author"),
-                        rs.getString("publisher"),
-                        rs.getInt("publicationYear"),
-                        rs.getString("isbn"),
-                        rs.getInt("quantityAvailable")
-                ));
+                books.add(mapResultSetToBook(rs));
             }
         }
         return books;
     }
 
     public void updateTitle(int id, String title) throws SQLException {
-        String sql = "UPDATE \"Book\" SET title = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, title);
-            ps.setInt(2, id);
-            ps.executeUpdate();
-            System.out.println("Titolo aggiornato con successo.");
-        }
+        updateField("title", id, title);
     }
 
     public void updateAuthor(int id, String author) throws SQLException {
-        String sql = "UPDATE \"Book\" SET author = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, author);
-            ps.setInt(2, id);
-            ps.executeUpdate();
-            System.out.println("Autore aggiornato con successo.");
-        }
+        updateField("author", id, author);
     }
 
     public void updatePublisher(int id, String publisher) throws SQLException {
-        String sql = "UPDATE \"Book\" SET publisher = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, publisher);
-            ps.setInt(2, id);
-            ps.executeUpdate();
-            System.out.println("Editore aggiornato con successo.");
-        }
+        updateField("publisher", id, publisher);
     }
 
     public void updatePublicationYear(int id, int year) throws SQLException {
-        String sql = "UPDATE \"Book\" SET publicationYear = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, year);
-            ps.setInt(2, id);
-            ps.executeUpdate();
-            System.out.println("Anno aggiornato con successo.");
-        }
+        updateField("publicationYear", id, year);
     }
 
     public void updateQuantityAvailable(int id, int quantity) throws SQLException {
-        String sql = "UPDATE \"Book\" SET quantityAvailable = ? WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, quantity);
-            ps.setInt(2, id);
-            ps.executeUpdate();
-            System.out.println("Quantità disponibile aggiornata con successo.");
-        }
+        updateField("quantityAvailable", id, quantity);
     }
 
     public void updateISBN(int id, String isbn) throws SQLException {
-        String sql = "UPDATE \"Book\" SET isbn = ? WHERE id = ?";
+        updateField("isbn", id, isbn);
+    }
+
+    public boolean existsByISBN(String isbn) throws SQLException {
+        String sql = "SELECT 1 FROM \"Book\" WHERE isbn = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, isbn);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    private Book mapResultSetToBook(ResultSet rs) throws SQLException {
+        return new Book(
+                rs.getInt("id"),
+                rs.getString("title"),
+                rs.getString("author"),
+                rs.getString("publisher"),
+                rs.getInt("publicationYear"),
+                rs.getString("isbn"),
+                rs.getInt("quantityAvailable")
+        );
+    }
+
+    private void updateField(String column, int id, Object value) throws SQLException {
+        String sql = "UPDATE \"Book\" SET " + column + " = ? WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setObject(1, value);
             ps.setInt(2, id);
             ps.executeUpdate();
-            System.out.println("ISBN aggiornato con successo.");
+            System.out.println(column + " updated successfully.");
         }
     }
 }

@@ -1,6 +1,6 @@
 package main.java.ORM;
 
-import main.java.DomainModel.PayPal;
+import coreentities.librarymanagement.PayPal;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

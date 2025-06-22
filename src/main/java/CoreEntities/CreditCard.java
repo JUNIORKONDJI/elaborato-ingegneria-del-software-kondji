@@ -1,20 +1,24 @@
 package coreentities.librarymanagement;
 
 import java.util.Scanner;
-
+import coreentities.librarymanagement.PaymentStrategy;
+import coreentities.librarymanagement.Book;
 public class CreditCard implements PaymentStrategy {
 
-    // constants
+    // Constants
     private static final float REFUND_PERCENTAGE = 0.9f;
     private static final float COMMISSION_PERCENTAGE = 0.01f;
 
-    // owner data
-    private String ownerName, ownerSurname;
+    // Owner data
+    private String ownerName;
+    private String ownerSurname;
 
-    // card data
-    private String cardNumber, cardExpirationDate, cardSecurityCode;
+    // Card data
+    private String cardNumber;
+    private String cardExpirationDate;
+    private String cardSecurityCode;
 
-    // constructors
+    // Constructor
     public CreditCard(String ownerName, String ownerSurname, String cardNumber, String cardExpirationDate, String cardSecurityCode) {
         this.ownerName = ownerName;
         this.ownerSurname = ownerSurname;
@@ -23,28 +27,46 @@ public class CreditCard implements PaymentStrategy {
         this.cardSecurityCode = cardSecurityCode;
     }
 
-    // getters - constants
-    public static float getRefundPercentage() { return REFUND_PERCENTAGE; }
-    public static float getCommissionPercentage() { return COMMISSION_PERCENTAGE; }
+    // Getters - constants
+    public static float getRefundPercentage() {
+        return REFUND_PERCENTAGE;
+    }
 
-    // getters - owner data
-    public String getOwnerName() { return ownerName; }
-    public String getOwnerSurname() { return ownerSurname; }
+    public static float getCommissionPercentage() {
+        return COMMISSION_PERCENTAGE;
+    }
 
-    // getters - card data
-    public String getCardNumber() { return cardNumber; }
-    public String getCardExpirationDate() { return cardExpirationDate; }
-    public String getCardSecurityCode() { return cardSecurityCode; }
+    // Getters - owner
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public String getOwnerSurname() {
+        return ownerSurname;
+    }
+
+    // Getters - card
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public String getCardExpirationDate() {
+        return cardExpirationDate;
+    }
+
+    public String getCardSecurityCode() {
+        return cardSecurityCode;
+    }
 
     public String getCreditCardData() {
-        return "Owner: " + ownerName + " " + ownerSurname + "\nCard number: " + cardNumber + "\nExpiration date: " + cardExpirationDate + "\nSecurity code: " + cardSecurityCode;
+        return "Owner: " + ownerName + " " + ownerSurname +
+                "\nCard Number: " + cardNumber +
+                "\nExpiration Date: " + cardExpirationDate +
+                "\nSecurity Code: " + cardSecurityCode;
     }
 
     @Override
     public void pay(Book book) {
-
-        // SIMULATE PAYMENT
-
         float amount = book.getPrice();
 
         if (amount < 0) throw new IllegalArgumentException("\nInvalid amount");
@@ -56,74 +78,43 @@ public class CreditCard implements PaymentStrategy {
         System.out.println("Amount: " + amount + "€ (including " + (COMMISSION_PERCENTAGE * 100) + "% commission)");
 
         System.out.println("\nConfirm the payment? (yes/no)");
-
         Scanner scanner = new Scanner(System.in);
         String confirmation = scanner.nextLine().toLowerCase();
 
         if (!confirmation.equals("yes")) {
-            System.out.println("Payment cancelled!");
+            System.out.println("Payment cancelled.");
             return;
         }
 
         System.out.println("Paying with credit card...");
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            System.err.println("Error: " + e.getMessage());
-        }
+        simulateProcessing();
 
         System.out.println("Enter your credit card security code:");
-
-        String password;
-        boolean isTrue;
-
+        String inputCode;
         do {
-            password = scanner.nextLine();
-            isTrue = password.equals(cardSecurityCode);
-            if (!isTrue) {
-                System.out.println("Incorrect security code! Try again:");
+            inputCode = scanner.nextLine();
+            if (!inputCode.equals(cardSecurityCode)) {
+                System.out.println("Incorrect code, try again:");
             }
-        } while (!isTrue);
+        } while (!inputCode.equals(cardSecurityCode));
 
         System.out.println("Connecting to the bank...");
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            System.err.println("Error: " + e.getMessage());
-        }
+        simulateProcessing();
 
         System.out.println("Payment successful!");
     }
 
     @Override
     public void refund(Book book) {
+        float amount = book.getPrice() * REFUND_PERCENTAGE;
 
-        // SIMULATE REFUND
+        System.out.println("\nProcessing refund...");
+        System.out.println("Book: " + book.getTitle() + ", User: " + ownerName + " " + ownerSurname);
+        System.out.println("Amount refundable: " + amount + "€ (after " + Math.round((1 - REFUND_PERCENTAGE) * 1000) / 10.0 + "% commission)");
 
-        float amount = book.getPrice();
-        amount *= REFUND_PERCENTAGE;
-
-        System.out.println("\nRefunding the payment...");
-
-        System.out.println("Book: " + book.getIsbn() + " " + book.getTitle() + ", User: " + ownerName + " " + ownerSurname);
-
-        System.out.println("Amount refundable: " + amount + "€ (including " + Math.round((1 - REFUND_PERCENTAGE) * 1000) / 10.0 + "% commission)");
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            System.err.println("Error: " + e.getMessage());
-        }
-
+        simulateProcessing();
         System.out.println("Connecting to the bank...");
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            System.err.println("Error: " + e.getMessage());
-        }
+        simulateProcessing();
 
         System.out.println("Refund successful!");
     }
@@ -138,4 +129,12 @@ public class CreditCard implements PaymentStrategy {
         return getCreditCardData();
     }
 
+    // Helper method
+    private void simulateProcessing() {
+        try {
+            Thread.sleep(1000); // simulate processing time
+        } catch (InterruptedException e) {
+            System.err.println("Error during processing: " + e.getMessage());
+        }
+    }
 }

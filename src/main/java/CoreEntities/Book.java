@@ -1,4 +1,4 @@
-package coreentities.librarymanagement;
+package main.java.CoreEntities;
 
 public class Book {
 

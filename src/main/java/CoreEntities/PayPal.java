@@ -1,6 +1,8 @@
 package coreentities.librarymanagement;
 
 import java.util.Scanner;
+import main.java.CoreEntities.Book;
+import main.java.CoreEntities.PaymentStrategy;
 
 public class PayPal implements PaymentStrategy {
 
@@ -66,52 +68,6 @@ public class PayPal implements PaymentStrategy {
             return;
         }
 
-        System.out.println("Paying with PayPal...");
-
-        System.out.println("Enter your PayPal account password:");
-        String input;
-        do {
-            input = scanner.nextLine();
-            if (!input.equals(accountPassword)) {
-                System.out.println("Incorrect password. Try again:");
-            }
-        } while (!input.equals(accountPassword));
-
-        System.out.println("Connecting to PayPal server...");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            System.err.println("Interrupted: " + e.getMessage());
-        }
-
-        System.out.println("Payment successful!");
-    }
-
-    @Override
-    public void refund(Book book) {
-
-        float amount = book.getPrice() * REFUND_PERCENTAGE;
-
-        System.out.println("\nRefunding payment for book: " + book.getTitle());
-        System.out.println("User: " + ownerName + " " + ownerSurname);
-        System.out.println("Refund amount: " + amount + "€");
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            System.err.println("Interrupted: " + e.getMessage());
-        }
-
-        System.out.println("Refund completed.");
-    }
-
-    @Override
-    public String getPaymentMethod() {
-        return "PayPal";
-    }
-
-    @Override
-    public String getPaymentData() {
-        return getPayPalData();
+        System.out.println("Payment successful using PayPal!");
     }
 }

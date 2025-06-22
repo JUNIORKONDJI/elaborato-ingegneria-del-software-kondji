@@ -1,22 +1,21 @@
-// VERSIONE CONVERTITA PER BOOKTRACK CON COMMENTI IN ITALIANO
-// Sostituisce eventi con libri e partecipazioni con prenotazioni
-// La struttura logica rimane identica, ma adattata al contesto gestionale della biblioteca
+package main.java.main;
 
-package main;
-
-import main.java.LibraryManagement.*;
-import main.java.CoreEntities.*;
+import coreentities.librarymanagement.User;
+import main.java.LibraryManagement.LoginController;
+import main.java.LibraryManagement.UserBookPageController;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import coreentities.librarymanagement.Book;
+
 public class Main {
+
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         gestisciAccesso();
     }
 
-    // Gestione accesso iniziale (login, registrazione, accesso admin)
     public static void gestisciAccesso() throws SQLException, ClassNotFoundException {
         Scanner scanner = new Scanner(System.in);
         LoginController loginController = new LoginController();
@@ -46,14 +45,16 @@ public class Main {
                     String[] dati = registraUtente();
                     User user = loginController.register(
                             dati[0], dati[1], Integer.parseInt(dati[2]),
-                            dati[3], dati[4], dati[5], dati[6], dati[7], dati[8], dati[9]);
+                            dati[3], dati[4], dati[5], dati[6], dati[7], dati[8], dati[9]
+                    );
                     if (user != null) gestisciUtente(user);
                 }
                 case "3" -> {
                     System.out.print("Password Admin: ");
                     String password = scanner.nextLine();
-                    if (loginController.adminLogin(password) != null)
+                    if (loginController.adminLogin(password) != null) {
                         gestisciAdmin();
+                    }
                 }
                 case "4" -> System.exit(0);
                 default -> System.out.println("Opzione non valida. Riprova.");
@@ -61,7 +62,6 @@ public class Main {
         } while (true);
     }
 
-    // Gestione azioni utente loggato
     public static void gestisciUtente(User user) throws SQLException, ClassNotFoundException {
         Scanner scanner = new Scanner(System.in);
         String input;
@@ -85,7 +85,6 @@ public class Main {
         } while (true);
     }
 
-    // Mostra tutti i libri disponibili e permette di prenotarne
     public static void visualizzaPaginaLibri(User user) throws SQLException {
         UserBookPageController bookController = new UserBookPageController(user);
         Scanner scanner = new Scanner(System.in);
@@ -136,7 +135,6 @@ public class Main {
         } while (true);
     }
 
-    // Registrazione utente, restituisce i dati come array
     public static String[] registraUtente() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Registrazione utente:");
@@ -170,7 +168,6 @@ public class Main {
         return new String[]{nome, cognome, String.valueOf(eta), username, email, password, metodo, dato1, dato2, dato3};
     }
 
-    // Placeholder per le altre funzioni (gestione prenotazioni, profilo, admin)
     public static void gestisciPrenotazioniUtente(User user) {
         System.out.println("[TODO] Gestione dei propri libri inseriti");
     }

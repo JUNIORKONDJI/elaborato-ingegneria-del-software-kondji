@@ -1,6 +1,5 @@
 package test.LibraryManagement;
 
-import main.java.LibraryManagement.AdminUserController;
 import main.java.LibraryManagement.DatabaseResetController;
 
 import org.junit.jupiter.api.Test;

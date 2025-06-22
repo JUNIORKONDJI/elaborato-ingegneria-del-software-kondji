@@ -9,7 +9,8 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DatabaseConnectionManagerTest {
+public
+class DatabaseConnectionManagerTest {
 
     @Test
     public void testGetConnection() {
