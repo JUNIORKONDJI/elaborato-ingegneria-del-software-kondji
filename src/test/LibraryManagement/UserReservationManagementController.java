@@ -1,6 +1,6 @@
 package test.LibraryManagement;
 
-import main.java.LibraryManagement.AdminExtraController;
+import main.java.LibraryManagement.AdminExtraControllerTest;
 import main.java.LibraryManagement.LoginController;
 import main.java.LibraryManagement.UserReservationManagementController;
 import main.java.DomainModel.User;
@@ -61,7 +61,7 @@ class UserReservationManagementControllerTest {
         assertTrue(output3.contains("Book not found."));
 
         // Reset DB
-        AdminExtraController adminExtraController = new AdminExtraController();
+        AdminExtraControllerTest adminExtraController = new AdminExtraControllerTest();
         adminExtraController.generateDefaultDatabase();
     }
 
@@ -106,7 +106,7 @@ class UserReservationManagementControllerTest {
         assertTrue(output2.contains("Reservation not found."));
 
         // Reset DB
-        AdminExtraController adminExtraController = new AdminExtraController();
+        AdminExtraControllerTest adminExtraController = new AdminExtraControllerTest();
         adminExtraController.generateDefaultDatabase();
     }
 }

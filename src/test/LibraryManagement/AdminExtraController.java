@@ -1,76 +1,78 @@
-package main.java.LibraryManagement;
+package test.BusinessLogic;
 
-import main.java.ORM.AdminDAO;
+import main.java.BusinessLogic.AdminBookController;
+import main.java.BusinessLogic.AdminExtraController;
+import main.java.BusinessLogic.AdminUserController;
+import main.java.DomainModel.Book;
+import main.java.DomainModel.User;
+import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
-/**
- * Classe controller per la gestione delle operazioni di amministrazione extra come reset e inizializzazione del database.
- */
-public class AdminExtraController {
+import static org.junit.jupiter.api.Assertions.*;
 
-    /**
-     * Aggiorna la password dell'account admin nel database.
-     * @param newPassword la nuova password da impostare
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    public void updateAdminPassword(String newPassword) throws SQLException, ClassNotFoundException {
-        AdminDAO adminDAO = new AdminDAO();
-        adminDAO.updatePassword(newPassword);
+class AdminExtraController {
+
+    @Test
+    void resetPasswordTest() {
+        // Da implementare: verifica che la password dell'admin venga aggiornata correttamente
     }
 
-    /**
-     * Esegue il reset completo del database eliminando e ricreando le tabelle secondo lo script reset.sql.
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    public void resetDatabaseStructure() throws SQLException, ClassNotFoundException {
-        String sql = loadSqlScript("src/main/sql/reset.sql");
-
-        if (sql != null) {
-            AdminDAO adminDAO = new AdminDAO();
-            adminDAO.resetDatabase(sql);
-        }
+    @Test
+    void resetDatabaseTest() {
+        // Da implementare: verifica che il database venga cancellato e ricreato
     }
 
-    /**
-     * Popola il database con dati predefiniti a scopo di test, dopo averlo resettato.
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
-    public void initializeDefaultData() throws SQLException, ClassNotFoundException {
-        resetDatabaseStructure();
+    @Test
+    void generateDefaultDatabaseTest() throws SQLException, ClassNotFoundException {
 
-        String sql = loadSqlScript("src/main/sql/default.sql");
+        AdminUserController adminUserController = new AdminUserController();
+        AdminBookController adminBookController = new AdminBookController();
+        AdminExtraController adminExtraController = new AdminExtraController();
 
-        if (sql != null) {
-            AdminDAO adminDAO = new AdminDAO();
-            adminDAO.generateDefaultDatabase(sql);
-        }
-    }
+        // Dati utente di esempio
+        String name = "Alice";
+        String surname = "Wonderland";
+        int age = 28;
+        String username = "alice.user";
+        String email = "alice@example.com";
+        String password = "StrongPass123";
+        String paymentMethod = "PayPal";
+        String paypalEmail = "alice@paypal.com";
+        String paypalPassword = "paypalSecure";
 
-    /**
-     * Carica uno script SQL da un file.
-     * @param filePath percorso del file SQL
-     * @return il contenuto del file come stringa, oppure null in caso di errore
-     */
-    private String loadSqlScript(String filePath) {
-        StringBuilder sqlBuilder = new StringBuilder();
+        ArrayList<User> users = adminUserController.searchUser(username);
+        assertTrue(users == null || users.isEmpty());
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sqlBuilder.append(line).append("\n");
-            }
-        } catch (IOException e) {
-            System.err.println("Errore durante il caricamento del file SQL: " + e.getMessage());
-            return null;
-        }
+        adminUserController.addUser(name, surname, age, username, email, password, paymentMethod, paypalEmail, paypalPassword);
 
-        return sqlBuilder.toString();
+        assertEquals(1, adminUserController.searchUser(username).size());
+
+        // Dati libro di esempio
+        String title = "The Book of Testing";
+        String author = "Test Author";
+        int year = 2030;
+        String genre = "Testing";
+        String description = "A guide to unit testing.";
+        float price = 15.5f;
+        boolean refundable = true;
+
+        ArrayList<Book> books = adminBookController.searchBook(title);
+        assertTrue(books == null || books.isEmpty());
+
+        adminBookController.addBook(title, author, year, genre, description, refundable, price);
+
+        assertEquals(1, adminBookController.searchBook(title).size());
+
+        // Reset e inizializzazione del DB
+        adminExtraController.generateDefaultDatabase();
+
+        // Verifica che gli utenti e i libri siano stati eliminati
+        ArrayList<User> usersAfter = adminUserController.searchUser(username);
+        assertTrue(usersAfter == null || usersAfter.isEmpty());
+
+        ArrayList<Book> booksAfter = adminBookController.searchBook(title);
+        assertTrue(booksAfter == null || booksAfter.isEmpty());
     }
 }

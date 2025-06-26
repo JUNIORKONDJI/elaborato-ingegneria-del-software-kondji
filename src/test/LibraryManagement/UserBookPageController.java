@@ -1,6 +1,6 @@
 package test.LibraryManagement;
 
-import main.java.LibraryManagement.AdminExtraController;
+import main.java.LibraryManagement.AdminExtraControllerTest;
 import main.java.LibraryManagement.LoginController;
 import main.java.LibraryManagement.UserBookPageController;
 
@@ -71,7 +71,7 @@ class UserBookPageControllerTest {
         assertTrue(output2.contains("A book with the same title already exists."));
 
         // Reset
-        AdminExtraController adminExtraController = new AdminExtraController();
+        AdminExtraControllerTest adminExtraController = new AdminExtraControllerTest();
         adminExtraController.generateDefaultDatabase();
     }
 
@@ -140,7 +140,7 @@ class UserBookPageControllerTest {
         assertTrue(output3.contains("Book not found."));
 
         // Reset DB
-        AdminExtraController adminExtraController = new AdminExtraController();
+        AdminExtraControllerTest adminExtraController = new AdminExtraControllerTest();
         adminExtraController.generateDefaultDatabase();
     }
 }

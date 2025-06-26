@@ -1,6 +1,6 @@
 package test.LibraryManagement;
 
-import main.java.LibraryManagement.AdminExtraController;
+import main.java.LibraryManagement.AdminExtraControllerTest;
 import main.java.LibraryManagement.LoginController;
 import main.java.LibraryManagement.UserProfileController;
 import main.java.DomainModel.User;
@@ -105,7 +105,7 @@ class UserProfileControllerTest {
         assertTrue(output2.contains("You do not have a payment method."));
 
         // Ripristina lo stato del DB
-        AdminExtraController adminExtraController = new AdminExtraController();
+        AdminExtraControllerTest adminExtraController = new AdminExtraControllerTest();
         adminExtraController.generateDefaultDatabase();
     }
 }
